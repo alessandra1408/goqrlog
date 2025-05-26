@@ -1,7 +1,6 @@
 package qrcode
 
 import (
-	"io"
 	"net/http"
 
 	"github.com/alessandra1408/goqrlog/app"
@@ -41,16 +40,7 @@ func (h *handler) QRCodeHandler(c echo.Context) error {
 		})
 	}
 
-	body, err := io.ReadAll(c.Request().Body)
-	if err != nil {
-		h.log.Error("failed to read body: %v", err)
-		return c.String(http.StatusBadRequest, "failed to read body")
-	}
+	h.log.Infof("received QR code payload: %+v", req)
 
-	defer c.Request().Body.Close()
-
-	h.log.Info("received raw body: %s", string(body))
-
-	h.log.Info("QRCodeHandler called")
-	return c.Blob(http.StatusOK, "application/octet-stream", body)
+	return c.JSON(http.StatusOK, req)
 }
