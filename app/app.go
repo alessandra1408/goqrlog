@@ -19,7 +19,6 @@ type Options struct {
 
 func New(opts Options) *App {
 	return &App{
-		QRCode: qrcode.NewApp(),
-		Sheets: qrcode.NewApp(),
+		QRCode: qrcode.NewApp(opts.Cfg),
 	}
 }

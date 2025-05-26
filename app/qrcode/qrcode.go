@@ -1,25 +1,29 @@
 package qrcode
 
-import "log"
+import (
+	"context"
+
+	"github.com/alessandra1408/goqrlog/internal/config"
+	"github.com/alessandra1408/goqrlog/pkg/log"
+)
 
 type App interface {
-	// Define the methods that the App interface should have
+	QRCodeHandler(ctx context.Context, req *Request, log log.Log) error
 }
 
 type app struct {
-	// Define the fields that the app struct should have
+	cfg config.Config
 }
 
-func NewApp() App {
-
+func NewApp(cfg config.Config) App {
 	return &app{
-		// Initialize the app struct with the provided App
+		cfg: cfg,
 	}
 }
 
-func QRCodeHandler(app App) error {
+func (a *app) QRCodeHandler(ctx context.Context, req *Request, log log.Log) error {
 	// Implement the QRCodeHandler logic here
 	// For example, you might want to generate a QR code and return it
-	log.Println("QRCodeHandler called")
+	log.Info("QRCodeHandler called")
 	return nil
 }
