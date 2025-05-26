@@ -28,8 +28,15 @@ func Routes(g *echo.Group, apps *app.App, cfg config.Config, log log.Log) {
 }
 
 func (h *handler) QRCodeHandler(c echo.Context) error {
-	// Implement the QRCodeHandler logic here
-	// For example, you might want to generate a QR code and return it
+	body, err := c.Request().Body, error(nil)
+	defer body.Close()
+	data := make([]byte, c.Request().ContentLength)
+	_, err = body.Read(data)
+	if err != nil {
+		h.log.Error("failed to read body: %v", err)
+		return c.String(http.StatusBadRequest, "failed to read body")
+	}
+
 	h.log.Info("QRCodeHandler called")
-	return c.NoContent(http.StatusNoContent)
+	return c.Blob(http.StatusOK, "application/octet-stream", data)
 }
