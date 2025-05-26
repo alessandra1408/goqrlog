@@ -12,7 +12,7 @@ import (
 
 func NewEcho() *echo.Echo {
 	e := echo.New()
-	e.JSONSerializer = encoders.NewGoQRCodeLogJSONSerializer()
+	e.JSONSerializer = encoders.NewGoQRLogJSONSerializer()
 
 	e.Use(middleware.Recover())
 

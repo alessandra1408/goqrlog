@@ -1,6 +1,8 @@
 package app
 
 import (
+	"net/http"
+
 	"github.com/alessandra1408/goqrlog/app/qrcode"
 	"github.com/alessandra1408/goqrlog/internal/config"
 )
@@ -11,7 +13,8 @@ type App struct {
 }
 
 type Options struct {
-	Cfg config.Config
+	Cfg        config.Config
+	HttpClient *http.Client
 }
 
 func New(opts Options) *App {

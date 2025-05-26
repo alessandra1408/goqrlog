@@ -1,6 +1,8 @@
 package qrcode
 
 import (
+	"net/http"
+
 	"github.com/alessandra1408/goqrlog/app"
 	"github.com/alessandra1408/goqrlog/internal/config"
 	"github.com/alessandra1408/goqrlog/middleware"
@@ -29,5 +31,5 @@ func (h *handler) QRCodeHandler(c echo.Context) error {
 	// Implement the QRCodeHandler logic here
 	// For example, you might want to generate a QR code and return it
 	h.log.Info("QRCodeHandler called")
-	return nil
+	return c.NoContent(http.StatusNoContent)
 }

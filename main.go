@@ -14,6 +14,7 @@ import (
 	"github.com/alessandra1408/goqrlog/app"
 	"github.com/alessandra1408/goqrlog/internal/config"
 	"github.com/alessandra1408/goqrlog/pkg/echoutil"
+	"github.com/alessandra1408/goqrlog/pkg/httpclient"
 	"github.com/alessandra1408/goqrlog/pkg/log"
 	"github.com/alessandra1408/goqrlog/routes"
 	"go.uber.org/zap"
@@ -31,8 +32,13 @@ func main() {
 	log.Info("Configuring Echo framework...")
 	e := echoutil.NewEcho()
 
+	httpClient := httpclient.NewHTTPClient(cfg)
+
+	log.Info("Configuring Internal IDP Service...")
+
 	appOpts := app.Options{
-		Cfg: *cfg,
+		HttpClient: httpClient,
+		Cfg:        *cfg,
 	}
 
 	apps := app.New(appOpts)
@@ -94,8 +100,6 @@ func main() {
 	}
 
 	log.Info("Server exited properly")
-
-	fmt.Println("Hello, World!")
 }
 
 func setupLogger() log.Log {

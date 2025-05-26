@@ -25,14 +25,15 @@ type Auth struct {
 }
 
 type App struct {
-	Name        string `json:"name" validate:"required"`
-	Environment string `json:"environment" validate:"required"`
+	Name        string        `json:"name" validate:"required"`
+	Environment string        `json:"environment" validate:"required"`
+	HTTPTimeout time.Duration `json:"httpTimeout" validate:"required"`
 }
 
 type Config struct {
-	Auth   Auth   `json:"auth" validate:"required"`
-	App    App    `json:"app" validate:"required"`
-	Server Server `json:"server" validate:"required"`
+	Auth   *Auth   `json:"auth" validate:"required"`
+	App    *App    `json:"app" validate:"required"`
+	Server *Server `json:"server" validate:"required"`
 }
 
 func (cfg *Config) IsStaging() bool {
@@ -50,11 +51,13 @@ func Get() (*Config, error) {
 	v.SetConfigName("config")
 
 	v.AutomaticEnv()
+	v.SetDefault("app.httpTimeout", 30*time.Second)
 
 	_ = v.BindEnv("app.name", "APP_NAME")
 	_ = v.BindEnv("app.environment", "ENVIRONMENT")
 	_ = v.BindEnv("auth.key", "AUTH_KEY")
 	_ = v.BindEnv("server.port", "SERVER_PORT")
+	_ = v.BindEnv("app.httpTimeout", "HTTP_TIMEOUT")
 
 	err := v.ReadInConfig()
 	if err != nil {
