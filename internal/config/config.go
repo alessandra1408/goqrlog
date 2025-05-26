@@ -1,21 +1,38 @@
 package config
 
 import (
+	"errors"
+	"os"
+	"time"
+
+	"github.com/alessandra1408/goqrlog/pkg/log"
 	"github.com/go-playground/validator"
 	"github.com/spf13/viper"
 )
+
+type Server struct {
+	Port         string        `json:"port" validate:"required"`
+	IdleTimeout  time.Duration `json:"idleTimeout" validate:"required"`
+	ReadTimeout  time.Duration `json:"readTimeout" validate:"required"`
+	WriteTimeout time.Duration `json:"writeTimeout" validate:"required"`
+	SSLEnabled   bool          `json:"sslEnabled"`
+	CertFile     string        `json:"certFile" validate:"required"`
+	CertKey      string        `json:"certKey" validate:"required"`
+}
 
 type Auth struct {
 	Key string `json:"key" validate:"required"`
 }
 
 type App struct {
+	Name        string `json:"name" validate:"required"`
 	Environment string `json:"environment" validate:"required"`
 }
 
 type Config struct {
-	Auth Auth `json:"auth" validate:"required"`
-	App  App  `json:"app" validate:"required"`
+	Auth   Auth   `json:"auth" validate:"required"`
+	App    App    `json:"app" validate:"required"`
+	Server Server `json:"server" validate:"required"`
 }
 
 func (cfg *Config) IsStaging() bool {
@@ -34,8 +51,10 @@ func Get() (*Config, error) {
 
 	v.AutomaticEnv()
 
+	_ = v.BindEnv("app.name", "APP_NAME")
 	_ = v.BindEnv("app.environment", "ENVIRONMENT")
 	_ = v.BindEnv("auth.key", "AUTH_KEY")
+	_ = v.BindEnv("server.port", "SERVER_PORT")
 
 	err := v.ReadInConfig()
 	if err != nil {
@@ -55,4 +74,29 @@ func Get() (*Config, error) {
 	}
 
 	return &cfg, nil
+}
+
+func Log(log log.Log) error {
+	ll, ok := os.LookupEnv("LOG_LEVEL")
+	if !ok {
+		ll = "debug"
+	}
+
+	lv := log.Level()
+
+	err := lv.Set(ll)
+	if err != nil {
+		return errors.New("invalid level: " + err.Error())
+	}
+
+	return nil
+}
+
+func Local() {
+	l, ok := os.LookupEnv("LOCATION")
+	if !ok {
+		l = "America/Sao_Paulo"
+	}
+
+	time.Local, _ = time.LoadLocation(l)
 }

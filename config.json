@@ -1,0 +1,14 @@
+{
+  "app": {
+    "name": "Go QRCode Log"
+  },
+  "server": {
+    "port": 8080,
+    "idleTimeout": 60,
+    "readTimeout": 60,
+    "writeTimeout": 60,
+    "sslEnabled": false,
+    "certFile": "./certs/server.crt",
+    "certKey": "./certs/server.key"
+  }
+}
