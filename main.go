@@ -75,19 +75,10 @@ func main() {
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		if cfg.Server.SSLEnabled {
-			log.Info("Setting up HTTPS...")
-			log.Info("Starting server...")
-			err := e.StartTLS(":"+port, cfg.Server.CertFile, cfg.Server.CertKey)
-			if !errors.Is(err, http.ErrServerClosed) {
-				log.Fatal("Error on starting server: ", err)
-			}
-		} else {
-			log.Info("Starting server...")
-			err := e.StartServer(server)
-			if !errors.Is(err, http.ErrServerClosed) {
-				log.Fatal("Error on starting server: ", err)
-			}
+		log.Info("Starting server...")
+		err := e.StartServer(server)
+		if !errors.Is(err, http.ErrServerClosed) {
+			log.Fatal("Error on starting server: ", err)
 		}
 	}()
 
