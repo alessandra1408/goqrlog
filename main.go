@@ -56,8 +56,14 @@ func main() {
 	routes.RegisterRoutes(routesOptions)
 
 	log.Info("Configuring server...")
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = cfg.Server.Port
+	}
+
 	server := &http.Server{
-		Addr:         ":" + cfg.Server.Port,
+		Addr:         ":" + port,
 		IdleTimeout:  cfg.Server.IdleTimeout * time.Second,
 		ReadTimeout:  cfg.Server.ReadTimeout * time.Second,
 		WriteTimeout: cfg.Server.WriteTimeout * time.Second,

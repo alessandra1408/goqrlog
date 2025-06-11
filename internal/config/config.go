@@ -56,7 +56,10 @@ func Get() (*Config, error) {
 	_ = v.BindEnv("app.name", "APP_NAME")
 	_ = v.BindEnv("app.environment", "ENVIRONMENT")
 	_ = v.BindEnv("auth.key", "AUTH_KEY")
-	_ = v.BindEnv("server.port", "SERVER_PORT")
+	_ = v.BindEnv("server.idleTimeout", "IDLE_TIMEOUT")
+	_ = v.BindEnv("server.readTimeout", "READ_TIMEOUT")
+	_ = v.BindEnv("server.writeTimeout", "WRITE_TIMEOUT")
+	_ = v.BindEnv("server.port", "PORT")
 	_ = v.BindEnv("app.httpTimeout", "HTTP_TIMEOUT")
 
 	err := v.ReadInConfig()
