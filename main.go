@@ -34,7 +34,7 @@ func main() {
 
 	httpClient := httpclient.NewHTTPClient(cfg)
 
-	log.Info("Configuring Internal IDP Service...")
+	log.Info("Configuring GO QR Logs Service...")
 
 	appOpts := app.Options{
 		HttpClient: httpClient,
@@ -72,7 +72,7 @@ func main() {
 		if cfg.Server.SSLEnabled {
 			log.Info("Setting up HTTPS...")
 			log.Info("Starting server...")
-			err := e.StartTLS(":3000", cfg.Server.CertFile, cfg.Server.CertKey)
+			err := e.StartTLS(":8080", cfg.Server.CertFile, cfg.Server.CertKey)
 			if !errors.Is(err, http.ErrServerClosed) {
 				log.Fatal("Error on starting server: ", err)
 			}
