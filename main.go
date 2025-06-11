@@ -78,7 +78,7 @@ func main() {
 		if cfg.Server.SSLEnabled {
 			log.Info("Setting up HTTPS...")
 			log.Info("Starting server...")
-			err := e.StartTLS(":8080", cfg.Server.CertFile, cfg.Server.CertKey)
+			err := e.StartTLS(":"+port, cfg.Server.CertFile, cfg.Server.CertKey)
 			if !errors.Is(err, http.ErrServerClosed) {
 				log.Fatal("Error on starting server: ", err)
 			}
