@@ -10,7 +10,13 @@ import (
 	"github.com/alessandra1408/goqrlog/internal/middleware"
 	"github.com/alessandra1408/goqrlog/pkg/log"
 	"github.com/alessandra1408/goqrlog/pkg/model"
+	"github.com/alessandra1408/goqrlog/pkg/util"
 	"github.com/labstack/echo/v4"
+)
+
+const (
+	trunkedTokenString  = "trunked-token"
+	remoteAddressString = "remote-address"
 )
 
 type handler struct {
@@ -31,8 +37,16 @@ func Routes(g *echo.Group, apps *app.App, cfg config.Config, log log.Log) {
 }
 
 func (h *handler) QRCodeHandler(c echo.Context) error {
-	req := new(qrcode.Request)
+	ctx := c.Request().Context()
+	token := c.Request().Header.Get("Authorization")
+	trunkedToken := util.GetMaskedToken(token)
 
+	l := log.
+		LogWithUserAgent(h.log, c.Request().UserAgent()).
+		With(trunkedTokenString, trunkedToken).
+		With(remoteAddressString, c.RealIP())
+
+	req := new(qrcode.Request)
 	if err := c.Bind(req); err != nil {
 		h.log.Warnf(defaultErrors.ErrBindingMessage, err)
 		return c.JSON(http.StatusBadRequest, model.ErrorResponse{
@@ -40,7 +54,9 @@ func (h *handler) QRCodeHandler(c echo.Context) error {
 		})
 	}
 
+	res := h.apps.QRCode.QRCodeHandler(ctx, req, l)
+
 	h.log.Infof("received QR code payload: %+v", req)
 
-	return c.JSON(http.StatusOK, req)
+	return c.JSON(http.StatusOK, res)
 }
