@@ -13,6 +13,7 @@ import (
 
 	"github.com/alessandra1408/goqrlog/app"
 	"github.com/alessandra1408/goqrlog/internal/config"
+	"github.com/alessandra1408/goqrlog/pkg/db"
 	"github.com/alessandra1408/goqrlog/pkg/echoutil"
 	"github.com/alessandra1408/goqrlog/pkg/httpclient"
 	"github.com/alessandra1408/goqrlog/pkg/log"
@@ -34,11 +35,25 @@ func main() {
 
 	httpClient := httpclient.NewHTTPClient(cfg)
 
+	log.Info("Setting up database connection...")
+
+	db, err := db.NewDatabase(cfg.Database)
+	if err != nil {
+		log.Error("Error setting up database connection: ", err)
+		os.Exit(1)
+	}
+	defer func() {
+		if err := db.Conn.Close(context.Background()); err != nil {
+			log.Warn("Error closing database connection: ", err)
+		}
+	}()
+
 	log.Info("Configuring GO QR Logs Service...")
 
 	appOpts := app.Options{
 		HttpClient: httpClient,
 		Cfg:        *cfg,
+		DB:         db,
 	}
 
 	apps := app.New(appOpts)

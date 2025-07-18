@@ -30,10 +30,22 @@ type App struct {
 	HTTPTimeout time.Duration `json:"httpTimeout" validate:"required"`
 }
 
+type Database struct {
+	Scheme         string `json:"scheme" validate:"required"`
+	Host           string `json:"host" validate:"required"`
+	Port           int    `json:"port" validate:"required"`
+	SSLMode        string `json:"sslmode" validate:"required"`
+	ChannelBinding string `json:"channelBinding" validate:"required"`
+	Name           string `json:"databaseName" validate:"required"`
+	Username       string `json:"username" validate:"required"`
+	Password       string `json:"password" validate:"required"`
+}
+
 type Config struct {
-	Auth   *Auth   `json:"auth" validate:"required"`
-	App    *App    `json:"app" validate:"required"`
-	Server *Server `json:"server" validate:"required"`
+	Auth     *Auth     `json:"auth" validate:"required"`
+	App      *App      `json:"app" validate:"required"`
+	Server   *Server   `json:"server" validate:"required"`
+	Database *Database `json:"database" validate:"required"`
 }
 
 func (cfg *Config) IsStaging() bool {
@@ -61,6 +73,14 @@ func Get() (*Config, error) {
 	_ = v.BindEnv("server.writeTimeout", "WRITE_TIMEOUT")
 	_ = v.BindEnv("server.port", "PORT")
 	_ = v.BindEnv("app.httpTimeout", "HTTP_TIMEOUT")
+	_ = v.BindEnv("database.scheme", "DB_SCHEME")
+	_ = v.BindEnv("database.host", "DB_HOST")
+	_ = v.BindEnv("database.port", "DB_PORT")
+	_ = v.BindEnv("database.username", "DB_USERNAME")
+	_ = v.BindEnv("database.password", "DB_PASSWORD")
+	_ = v.BindEnv("database.name", "DB_NAME")
+	_ = v.BindEnv("database.sslmode", "DB_SSLMODE")
+	_ = v.BindEnv("database.channelBinding", "DB_CHANNEL_BINDING")
 
 	err := v.ReadInConfig()
 	if err != nil {

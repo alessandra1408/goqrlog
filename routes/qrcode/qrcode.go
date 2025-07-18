@@ -54,7 +54,19 @@ func (h *handler) QRCodeHandler(c echo.Context) error {
 		})
 	}
 
-	res := h.apps.QRCode.QRCodeHandler(ctx, req, l)
+	res, err := h.apps.QRCode.QRCodeHandler(ctx, req, l)
+	if err != nil {
+		h.log.Errorf("Error processing QR code request: %v", err)
+		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
+			Message: "Internal server error",
+		})
+	}
+	if res == nil {
+		h.log.Warn("No data found for the provided QR code request")
+		return c.JSON(http.StatusNotFound, model.ErrorResponse{
+			Message: "No data found for the provided QR code request",
+		})
+	}
 
 	h.log.Infof("received QR code payload: %+v", req)
 
