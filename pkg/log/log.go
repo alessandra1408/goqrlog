@@ -9,6 +9,7 @@ import (
 
 type Log interface {
 	Level() zapcore.Level
+	Debug(args ...interface{}) // Added Debug method
 	Info(args ...interface{})
 	Infof(template string, args ...interface{})
 	Warn(args ...interface{})
@@ -32,6 +33,10 @@ type log struct {
 
 func (l *log) Level() zapcore.Level {
 	return l.z.Level()
+}
+
+func (l *log) Debug(args ...interface{}) {
+	l.z.Debug(args...)
 }
 
 func (l *log) With(args ...interface{}) *zap.SugaredLogger {

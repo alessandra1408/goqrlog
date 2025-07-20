@@ -44,7 +44,11 @@ func main() {
 	}
 	defer func() {
 		if err := db.Conn.Close(context.Background()); err != nil {
-			log.Warn("Error closing database connection: ", err)
+			if strings.Contains(err.Error(), "broken pipe") {
+				log.Debug("Connection was already closed by server (broken pipe on close)")
+			} else {
+				log.Warn("Error closing database connection: ", err)
+			}
 		}
 	}()
 
