@@ -39,6 +39,9 @@ func Routes(g *echo.Group, apps *app.App, cfg config.Config, log log.Log) {
 func (h *handler) QRCodeHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	token := c.Request().Header.Get("Authorization")
+	c.Response().Header().Set("Access-Control-Allow-Origin", "https://qr-scanner-dom-jaime.surge.sh")
+	c.Response().Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	c.Response().Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
 	trunkedToken := util.GetMaskedToken(token)
 
 	l := log.
