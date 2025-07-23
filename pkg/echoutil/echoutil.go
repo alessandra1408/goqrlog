@@ -1,6 +1,7 @@
 package echoutil
 
 import (
+	"net/http"
 	"reflect"
 	"strings"
 
@@ -16,6 +17,8 @@ func NewEcho() *echo.Echo {
 
 	e.Use(middleware.Recover())
 
+	e.Use(CORSMiddleware())
+
 	e.IPExtractor = echo.ExtractIPFromRealIPHeader()
 
 	e.HideBanner = true
@@ -23,6 +26,22 @@ func NewEcho() *echo.Echo {
 	return e
 }
 
+// Adicione esta função no mesmo arquivo (ou em um arquivo middleware.go)
+func CORSMiddleware() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			c.Response().Header().Set("Access-Control-Allow-Origin", "https://qr-scanner-dom-jaime.surge.sh")
+			c.Response().Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+			c.Response().Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+
+			if c.Request().Method == "OPTIONS" {
+				return c.NoContent(http.StatusOK)
+			}
+
+			return next(c)
+		}
+	}
+}
 func SetupValidator() *validator.Validate {
 	v := validator.New()
 
