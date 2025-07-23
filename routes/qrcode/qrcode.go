@@ -64,7 +64,7 @@ func (h *handler) QRCodeHandler(c echo.Context) error {
 
 	h.log.Infof("response from QR code handler: %+v", res)
 
-	if res == nil {
+	if res == (qrcode.Response{}) {
 		h.log.Warn("No data found for the provided QR code request")
 		return c.JSON(http.StatusNotFound, model.ErrorResponse{
 			Message: "No data found for the provided QR code request",
