@@ -2,6 +2,7 @@ package qrcode
 
 import (
 	"context"
+	"time"
 
 	"github.com/alessandra1408/goqrlog/internal/config"
 	"github.com/alessandra1408/goqrlog/pkg/db"
@@ -26,6 +27,9 @@ func NewApp(cfg config.Config, db *db.Database) App {
 }
 
 func (a *app) QRCodeHandler(ctx context.Context, req *Request, log log.Log) (pgx.Rows, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
 	log.Info("QRCodeHandler called")
 
 	query := "SELECT * FROM estudantes WHERE matricula = $1;"
