@@ -46,7 +46,7 @@ func (a *app) QRCodeHandler(ctx context.Context, req *Request, log log.Log) (Res
 
 	log.Info("QRCodeHandler called")
 
-	query := "SELECT * FROM estudantes WHERE matricula = $1;"
+	query := "SELECT turma, matricula, estudante FROM estudantes WHERE matricula = $1;"
 	rows, err := a.db.Pool.Query(ctx, query, req.MatriculaAluno)
 	if err != nil {
 		log.Errorf("Error fetching data for matricula %d: %v", req.MatriculaAluno, err)
