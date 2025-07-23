@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/alessandra1408/goqrlog/internal/encoders"
 	"github.com/go-playground/validator/v10"
@@ -13,6 +14,9 @@ import (
 
 func NewEcho() *echo.Echo {
 	e := echo.New()
+	e.Server.ReadTimeout = 15 * time.Second
+	e.Server.WriteTimeout = 15 * time.Second
+
 	e.JSONSerializer = encoders.NewGoQRLogJSONSerializer()
 
 	e.Use(middleware.Recover())

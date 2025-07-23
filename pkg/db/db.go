@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/alessandra1408/goqrlog/internal/config"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -18,7 +19,24 @@ func NewDatabase(cfg *config.Database) (*Database, error) {
 		cfg.SSLMode, cfg.ChannelBinding,
 	)
 
-	pool, err := pgxpool.New(context.Background(), connStr)
+	config, err := pgxpool.ParseConfig(connStr)
+	if err != nil {
+		return nil, fmt.Errorf("não foi possível parsear configuração do pool: %w", err)
+	}
+
+	// 🔧 Ajuste de timeouts e healthcheck
+	config.MaxConnIdleTime = 30 * time.Second   // conexões inativas serão fechadas após 30s
+	config.MaxConnLifetime = 30 * time.Minute   // vida máxima da conexão
+	config.HealthCheckPeriod = 30 * time.Second // verificação de saúde do pool
+
+	// Opcional: limitar o número de conexões simultâneas, dependendo do Neon
+	// config.MaxConns = 10
+
+	// Use um context com timeout curto só para criar o pool
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	pool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("não foi possível conectar: %w", err)
 	}
