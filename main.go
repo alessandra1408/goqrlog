@@ -43,13 +43,7 @@ func main() {
 		os.Exit(1)
 	}
 	defer func() {
-		if err := db.Conn.Close(context.Background()); err != nil {
-			if strings.Contains(err.Error(), "broken pipe") {
-				log.Debug("Connection was already closed by server (broken pipe on close)")
-			} else {
-				log.Warn("Error closing database connection: ", err)
-			}
-		}
+		db.Pool.Close()
 	}()
 
 	log.Info("Configuring GO QR Logs Service...")

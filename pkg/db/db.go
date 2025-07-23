@@ -5,11 +5,11 @@ import (
 	"fmt"
 
 	"github.com/alessandra1408/goqrlog/internal/config"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Database struct {
-	Conn *pgx.Conn
+	Pool *pgxpool.Pool
 }
 
 func NewDatabase(cfg *config.Database) (*Database, error) {
@@ -18,22 +18,22 @@ func NewDatabase(cfg *config.Database) (*Database, error) {
 		cfg.SSLMode, cfg.ChannelBinding,
 	)
 
-	conn, err := pgx.Connect(context.Background(), connStr)
+	pool, err := pgxpool.New(context.Background(), connStr)
 	if err != nil {
 		return nil, fmt.Errorf("não foi possível conectar: %w", err)
 	}
 
-	return &Database{Conn: conn}, nil
+	return &Database{Pool: pool}, nil
 }
 
 func (db *Database) Get(ctx context.Context, matricula int, dest ...any) error {
 	query := fmt.Sprintf("SELECT * FROM domjaimedb WHERE matricula = %d", matricula)
 
-	return db.Conn.QueryRow(ctx, query).Scan(dest...)
+	return db.Pool.QueryRow(ctx, query).Scan(dest...)
 }
 
 func (db *Database) Exec(ctx context.Context, query string, args ...any) (int64, error) {
-	ct, err := db.Conn.Exec(ctx, query, args...)
+	ct, err := db.Pool.Exec(ctx, query, args...)
 	if err != nil {
 		return 0, err
 	}
@@ -41,7 +41,7 @@ func (db *Database) Exec(ctx context.Context, query string, args ...any) (int64,
 }
 
 func (db *Database) Query(ctx context.Context, query string, args ...any) ([][]any, error) {
-	rows, err := db.Conn.Query(ctx, query, args...)
+	rows, err := db.Pool.Query(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}

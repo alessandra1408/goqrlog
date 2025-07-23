@@ -2,15 +2,15 @@ package qrcode
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/alessandra1408/goqrlog/internal/config"
 	"github.com/alessandra1408/goqrlog/pkg/db"
 	"github.com/alessandra1408/goqrlog/pkg/log"
+	"github.com/jackc/pgx/v5"
 )
 
 type App interface {
-	QRCodeHandler(ctx context.Context, req *Request, log log.Log) ([][]any, error)
+	QRCodeHandler(ctx context.Context, req *Request, log log.Log) (pgx.Rows, error)
 }
 
 type app struct {
@@ -25,18 +25,17 @@ func NewApp(cfg config.Config, db *db.Database) App {
 	}
 }
 
-func (a *app) QRCodeHandler(ctx context.Context, req *Request, log log.Log) ([][]any, error) {
+func (a *app) QRCodeHandler(ctx context.Context, req *Request, log log.Log) (pgx.Rows, error) {
 	log.Info("QRCodeHandler called")
 
-	query := fmt.Sprintf("SELECT * FROM estudantes e WHERE e.matricula = '%d';", req.MatriculaAluno)
-
-	result, err := a.db.Query(ctx, query)
+	query := "SELECT * FROM estudantes WHERE matricula = $1;"
+	rows, err := a.db.Pool.Query(ctx, query, req.MatriculaAluno)
 	if err != nil {
 		log.Errorf("Error fetching data for matricula %d: %v", req.MatriculaAluno, err)
 		return nil, err
 	}
 
-	return result, nil
+	return rows, nil
 }
 
 //"relation \"domjaimedb.estudantes\" does not exist"
