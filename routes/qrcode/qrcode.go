@@ -61,6 +61,9 @@ func (h *handler) QRCodeHandler(c echo.Context) error {
 			Message: "Internal server error",
 		})
 	}
+
+	h.log.Infof("response from QR code handler: %+v", res)
+
 	if res == nil {
 		h.log.Warn("No data found for the provided QR code request")
 		return c.JSON(http.StatusNotFound, model.ErrorResponse{
